@@ -7,7 +7,8 @@ const port = 3000;
 let timeFormt = {
 	Hour : 0,
 	Minute : 0,
-	Seconds: 0
+	Seconds: 0,
+	UTC : ""
 }
 // Inicialmente, el XML estara vaci­o
 let timeXML = "<root> <hours>"+timeFormt.Hour+"</hours> <minutes>"+timeFormt.Hour+"</minutes> <seconds>"+timeFormt.Hour+"</seconds> </root>";
@@ -26,7 +27,12 @@ app.use((req,res,next) => {
 });
 
 // Ruta GET para acceder al XML
-app.get('/timeXML', (req, res) => { res.sendFile(__dirname + '/archivo.xml');
+/** http://localhost:3000/timeXML?timezone=GMT-7  */
+app.get('/timeXML', (req, res) => { 
+	console.log( req.query);
+	timeFormt.UTC = req.query; //
+	res.json( timeFormt);
+	//res.sendFile(__dirname + '/archivo.xml');
 });
 
 //update time and date
@@ -38,11 +44,13 @@ setInterval(() => {
 	timeFormt.Hour = nowTime.getHours();
 	timeFormt.Minute = nowTime.getMinutes();
 	timeFormt.Seconds = nowTime.getSeconds();
+	timeFormt.UTC = nowTime;
 
-	timeXML = "<root> <hours>"+timeFormt.Hour+"</hours> <minutes>"+timeFormt.Minute+"</minutes> <seconds>"+timeFormt.Seconds+"</seconds> </root>";
-    fs.writeFileSync('archivo.xml', timeXML); 
+	console.log( timeFormt );
+	//timeXML = "<root> <hours>"+timeFormt.Hour+"</hours> <minutes>"+timeFormt.Minute+"</minutes> <seconds>"+timeFormt.Seconds+"</seconds> </root>";
+    //fs.writeFileSync('archivo.xml', timeXML); 
 
-}, 1000);
+}, 900);
 // Iniciar el servidor
 app.listen(port, () => { 
 	console.log("Servidor escuchando en http://localhost " + port);
